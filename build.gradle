@@ -1,0 +1,40 @@
+plugins {
+    id 'application'
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+
+group 'com.github.alexeylisyutenko'
+version '1.0'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+
+test {
+    useJUnitPlatform()
+}
+
+javafx {
+    version = '11.0.2'
+    modules = ['javafx.controls']
+}
+
+mainClassName = 'ru.alexeylisyutenko.mandelbrotset.MandelbrotSetApplication'
+
+dependencies {
+    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'com.google.guava:guava:28.1-jre'
+    compileOnly 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+    testImplementation 'org.mockito:mockito-core:2.21.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:2.23.0'
+    testCompileOnly 'org.projectlombok:lombok:1.18.10'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+}
