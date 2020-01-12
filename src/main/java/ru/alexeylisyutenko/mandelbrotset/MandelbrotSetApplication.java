@@ -33,8 +33,6 @@ public class MandelbrotSetApplication extends Application {
     }
 
     private Parent createContent() {
-        // X boundaries (-2.5, 1).
-        // Y boundaries (-1, 1).
         Pane root = new Pane();
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
@@ -45,26 +43,50 @@ public class MandelbrotSetApplication extends Application {
     }
 
     private void draw(GraphicsContext gc) {
+        // Histogram coloring.
+        int maxIterations = 1000;
+
+        // 1st pass.
+        int[][] iterationCounts = new int[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                iterationCounts[x][y] = calculateMandelbrotConvergenceLevel(pixelXToCoordinate(x), pixelYToCoordinate(y), maxIterations);
+            }
+        }
+
+        // 2nd pass.
+        int[] numIterationsPerPixel = new int[maxIterations + 1];
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                numIterationsPerPixel[iterationCounts[x][y]]++;
+            }
+        }
+
+        // 3rd pass.
+        int total = 0;
+        for (int i = 0; i < numIterationsPerPixel.length; i++) {
+            total += numIterationsPerPixel[i];
+        }
+
+        // 4th pass.
+        double[][] hue = new double[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                int iteration = iterationCounts[x][y];
+                for (int i = 0; i <= iteration; i++) {
+                    hue[x][y] += (double) numIterationsPerPixel[i] / total;
+                }
+            }
+        }
+
+        // 5th pass.
         PixelWriter pixelWriter = gc.getPixelWriter();
-        for (int y = 0; y < HEIGHT; y++) {
-            for (int x = 0; x < WIDTH; x++) {
-                Color color = calculateMandelbrotPixelColor(pixelXToCoordinate(x), pixelYToCoordinate(y));
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                Color color = Color.LIGHTBLUE.interpolate(Color.BLACK, Math.min(hue[x][y], 1.0));
                 pixelWriter.setColor(x, y, color);
             }
         }
-    }
-
-    private Color calculateMandelbrotPixelColor(double x0, double y0) {
-        int maxIterations = 1000;
-        int iteration = calculateMandelbrotConvergenceLevel(x0, y0, maxIterations);
-
-        if (iteration == maxIterations) {
-            return Color.BLACK;
-        } else {
-            return Color.LIGHTBLUE;
-        }
-
-        // TODO: Try other coloring options. Histogram coloring.
     }
 
     private int calculateMandelbrotConvergenceLevel(double x0, double y0, int iterations) {
