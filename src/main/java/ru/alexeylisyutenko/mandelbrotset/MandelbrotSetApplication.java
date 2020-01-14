@@ -83,7 +83,9 @@ public class MandelbrotSetApplication extends Application {
         PixelWriter pixelWriter = gc.getPixelWriter();
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                Color color = Color.LIGHTBLUE.interpolate(Color.BLACK, Math.min(hue[x][y], 1.0));
+                Color color = Color.hsb(218,
+                        1.0 - Math.min(hue[x][y], 1.0),
+                        iterationCounts[x][y] < maxIterations ? 1.0 : 0.0);
                 pixelWriter.setColor(x, y, color);
             }
         }
